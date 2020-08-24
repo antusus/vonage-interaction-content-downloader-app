@@ -4,7 +4,7 @@ import IcsClient from './client';
 const download = async (downloadPath: string, clientId: string, clientSecret: string) => {
   const icsClient = new IcsClient(clientId, clientSecret, 'emea', downloadPath);
 
-  const start = moment().utc().subtract(30, 'day').startOf('day').toISOString();
+  const start = moment().utc().subtract(7, 'day').startOf('day').toISOString();
   const end = moment().utc().subtract(1, 'day').endOf('day').toISOString();
 
   const pageNumber = 1;

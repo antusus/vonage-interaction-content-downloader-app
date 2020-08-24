@@ -3,6 +3,7 @@ import { AxiosInstance } from 'axios';
 const axios = require('axios');
 const qs = require('qs');
 const fs = require('fs').promises;
+const log = require('electron-log');
 
 class IcsClient {
   private clientId: string;
@@ -81,7 +82,7 @@ class IcsClient {
       .then(
         (r) => r.data,
         (e) => {
-          console.error(
+          log.error(
             'Search failed',
             e.response.data.message,
             e.response.statusText
