@@ -18,10 +18,15 @@ const Download = () => {
       os.homedir(),
       'interaction-content-download'
     );
-    fs.stat(downloadDirPath, (err: any) => {
+    fs.stat(downloadDirPath, async (err: any) => {
       if (err && err.code === 'ENOENT') {
         log.log(`Creating ${downloadDirPath}`);
-        fs.mkdirSync(downloadDir);
+        await fs.mkdir(downloadDirPath, null, (error: Error) => {
+          if (error) {
+            log.error(error);
+            throw error;
+          }
+        });
       }
     });
     setDownloadDir(downloadDirPath);
@@ -31,8 +36,8 @@ const Download = () => {
     dotenv.config({
       path: path.join(os.homedir(), '.interaction-content-downloader.env'),
     });
-    setClientId(process.env['CLIENT_ID']);
-    setClientSecret(process.env['CLIENT_SECRET']);
+    setClientId(process.env.CLIENT_ID);
+    setClientSecret(process.env.CLIENT_SECRET);
   };
 
   const setInitialState = () => {
@@ -57,7 +62,10 @@ const Download = () => {
   return (
     <div className={styles.container}>
       <h2>Download Content</h2>
-      <h3>Content will be downloaded to {downloadDir}</h3>
+      <h3>
+        Content will be downloaded to
+        {downloadDir}
+      </h3>
       <form onSubmit={handleSubmit}>
         <label htmlFor="clientId">Client Id</label>
         <p>
