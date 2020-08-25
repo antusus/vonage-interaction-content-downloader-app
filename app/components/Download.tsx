@@ -63,8 +63,7 @@ const Download = () => {
     <div className={styles.container}>
       <h2>Download Content</h2>
       <h3>
-        Content will be downloaded to
-        {downloadDir}
+        Content will be downloaded to {downloadDir}
       </h3>
       <form onSubmit={handleSubmit}>
         <label htmlFor="clientId">Client Id</label>

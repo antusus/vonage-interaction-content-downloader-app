@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios';
+import {AxiosInstance} from 'axios';
 
 const axios = require('axios');
 const qs = require('qs');
@@ -82,11 +82,7 @@ class IcsClient {
       .then(
         (r) => r.data,
         (e) => {
-          log.error(
-            'Search failed',
-            e.response.data.message,
-            e.response.statusText
-          );
+          log.error(`Search failed Status[${e.response.status}] Response: `, e.response.data);
           throw e;
         }
       );
@@ -117,7 +113,7 @@ class IcsClient {
       .then(
         (r) => this.saveToDisk(r, interactionId, contentKey),
         (e) => {
-          console.error(
+          log.error(
             `Content ${contentKey} couldn't be downloaded for ${interactionId} - ${contentUrl}`,
             e.response.status
           );
@@ -125,7 +121,7 @@ class IcsClient {
         }
       )
       .then(() =>
-        console.log(`Content ${contentKey} was downloaded for ${interactionId}`)
+        log.info(`Content ${contentKey} was downloaded for ${interactionId}`)
       );
   }
 
@@ -136,7 +132,7 @@ class IcsClient {
    */
   async downloadPage(items: any) {
     for (const i of items) {
-      await this.downloadAllContent(i.guid, i.content).catch(console.error);
+      await this.downloadAllContent(i.guid, i.content).catch(log.error);
     }
   }
 
@@ -159,24 +155,24 @@ class IcsClient {
         }
       )
       .then(
-        (r) => r.data.access_token,
+        (r) => {
+          return r.data.access_token;
+        },
         (e) => {
-          console.error('Authentication failed', e);
+          log.error('Authentication failed', e.response.data);
           throw e;
         }
       );
   }
 
   private downloadAllContent(interactionId: string, contentList: any) {
-    console.log(
-      `All content for interaction ${interactionId} will be downloaded`
-    );
+    log.info(`All content for interaction ${interactionId} will be downloaded`);
     return Promise.all(
       contentList.map((c: any) =>
         this.downloadContent(interactionId, c.contentKey)
       )
     ).then(() =>
-      console.log(`All content for interaction ${interactionId} downloaded\n`)
+      log.info(`All content for interaction ${interactionId} downloaded`)
     );
   }
 

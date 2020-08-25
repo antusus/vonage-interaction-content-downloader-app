@@ -85,6 +85,8 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
       mainWindow.focus();
+      // uncomment to use Dev Tools in production build
+      // mainWindow.webContents.openDevTools();
     }
   });
 
