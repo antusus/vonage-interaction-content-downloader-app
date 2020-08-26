@@ -1,34 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import download from '../utils/downloader';
 import styles from './Download.css';
+import { DownloadContentMessage } from '../utils/client';
 
+const { ipcRenderer } = require('electron');
 const os = require('os');
 const path = require('path');
-const fs = require('fs');
 const dotenv = require('dotenv');
-const log = require('electron-log');
 
 const Download = () => {
   const [downloadDir, setDownloadDir] = useState<string>('');
   const [clientId, setClientId] = useState<string>('');
   const [clientSecret, setClientSecret] = useState<string>('');
 
-  const setupDownloadFolder = () => {
+  const setupDownloadFolderPath = () => {
     const downloadDirPath = path.join(
       os.homedir(),
       'interaction-content-download'
     );
-    fs.stat(downloadDirPath, async (err: any) => {
-      if (err && err.code === 'ENOENT') {
-        log.log(`Creating ${downloadDirPath}`);
-        await fs.mkdir(downloadDirPath, null, (error: Error) => {
-          if (error) {
-            log.error(error);
-            throw error;
-          }
-        });
-      }
-    });
     setDownloadDir(downloadDirPath);
   };
 
@@ -41,13 +29,19 @@ const Download = () => {
   };
 
   const setInitialState = () => {
-    setupDownloadFolder();
     setupClientCredentials();
+    setupDownloadFolderPath();
   };
   useEffect(setInitialState, []);
 
   const handleSubmit = (event: React.FormEvent) => {
-    download(downloadDir, clientId, clientSecret);
+    const props: DownloadContentMessage = {
+      clientId,
+      clientSecret,
+      downloadPath: downloadDir,
+    };
+    // download must happen in the main process.
+    ipcRenderer.invoke('download-content', props);
     event.preventDefault();
   };
 

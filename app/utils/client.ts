@@ -1,4 +1,4 @@
-import {AxiosInstance} from 'axios';
+import { AxiosInstance } from 'axios';
 
 const axios = require('axios');
 const qs = require('qs');
@@ -106,7 +106,7 @@ class IcsClient {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/vnd.newvoicemedia.v2+json',
-            'x-nvm-application': 'node-sample',
+            'x-nvm-application': 'ics-downloader-app',
           },
         })
       )
@@ -165,11 +165,11 @@ class IcsClient {
       );
   }
 
-  private downloadAllContent(interactionId: string, contentList: any) {
+  private async downloadAllContent(interactionId: string, contentList: any) {
     log.info(`All content for interaction ${interactionId} will be downloaded`);
     return Promise.all(
-      contentList.map((c: any) =>
-        this.downloadContent(interactionId, c.contentKey)
+      contentList.map(async (c: any) =>
+        await this.downloadContent(interactionId, c.contentKey)
       )
     ).then(() =>
       log.info(`All content for interaction ${interactionId} downloaded`)
@@ -206,3 +206,9 @@ class IcsClient {
 }
 
 export default IcsClient;
+
+export interface DownloadContentMessage {
+  clientId: string;
+  clientSecret: string;
+  downloadPath: string;
+}

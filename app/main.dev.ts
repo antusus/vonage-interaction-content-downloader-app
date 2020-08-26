@@ -11,10 +11,13 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import * as fs from 'fs';
 import MenuBuilder from './menu';
+import { DownloadContentMessage } from './utils/client';
+import download from './utils/downloader';
 
 export default class AppUpdater {
   constructor() {
@@ -48,6 +51,20 @@ const installExtensions = async () => {
   ).catch(console.log);
 };
 
+const setupDownloadFolder = (downloadDirPath: string) => {
+  fs.stat(downloadDirPath, async (err: any) => {
+    if (err && err.code === 'ENOENT') {
+      log.log(`Creating ${downloadDirPath}`);
+      await fs.mkdir(downloadDirPath, null, (error: Error) => {
+        if (error) {
+          log.error(error);
+          throw error;
+        }
+      });
+    }
+  });
+};
+
 const createWindow = async () => {
   if (
     process.env.NODE_ENV === 'development' ||
@@ -74,6 +91,12 @@ const createWindow = async () => {
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 
+  ipcMain.handle('download-content', async (event: Electron.Event, props: DownloadContentMessage) => {
+      setupDownloadFolder(props.downloadPath);
+      await download(props.downloadPath, props.clientId, props.clientSecret);
+    }
+  );
+
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   mainWindow.webContents.on('did-finish-load', () => {
@@ -85,8 +108,6 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
       mainWindow.focus();
-      // uncomment to use Dev Tools in production build
-      // mainWindow.webContents.openDevTools();
     }
   });
 
