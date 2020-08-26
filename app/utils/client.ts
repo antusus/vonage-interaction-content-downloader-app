@@ -210,5 +210,6 @@ export default IcsClient;
 export interface DownloadContentMessage {
   clientId: string;
   clientSecret: string;
+  region: string;
   downloadPath: string;
 }

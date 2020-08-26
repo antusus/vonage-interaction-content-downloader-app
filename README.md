@@ -1,5 +1,10 @@
 # Interaction Content Downloader application spike
 
+This spike is using ICS Public API to search for content in last 7 days, 
+then it downloads first page (10 items) of binary data.
+
+To use you will need a client credentials for one of the scpecified regions.
+
 ### [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate) was used to build this application.
 It also uses:
  - [Electron](https://electron.atom.io/)

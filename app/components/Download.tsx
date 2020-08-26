@@ -11,6 +11,7 @@ const Download = () => {
   const [downloadDir, setDownloadDir] = useState<string>('');
   const [clientId, setClientId] = useState<string>('');
   const [clientSecret, setClientSecret] = useState<string>('');
+  const [region, setRegion] = useState<string>('');
 
   const setupDownloadFolderPath = () => {
     const downloadDirPath = path.join(
@@ -26,6 +27,7 @@ const Download = () => {
     });
     setClientId(process.env.CLIENT_ID);
     setClientSecret(process.env.CLIENT_SECRET);
+    setRegion(process.env.REGION);
   };
 
   const setInitialState = () => {
@@ -38,6 +40,7 @@ const Download = () => {
     const props: DownloadContentMessage = {
       clientId,
       clientSecret,
+      region,
       downloadPath: downloadDir,
     };
     // download must happen in the main process.
@@ -53,6 +56,10 @@ const Download = () => {
     setClientSecret(event.target.value);
   };
 
+  const handleRegionChange = (event: React.ChangeEvent) => {
+    setRegion(event.target.value);
+  };
+
   return (
     <div className={styles.container}>
       <h2>Download Content</h2>
@@ -60,6 +67,14 @@ const Download = () => {
         Content will be downloaded to {downloadDir}
       </h3>
       <form onSubmit={handleSubmit}>
+        <label htmlFor="region">Region</label>
+        <p>
+          <select value={region} onChange={handleRegionChange}>
+            <option value="APAC">APAC</option>
+            <option value="EMEA">EMEA</option>
+            <option value="NAM">NAM</option>
+          </select>
+        </p>
         <label htmlFor="clientId">Client Id</label>
         <p>
           <input
