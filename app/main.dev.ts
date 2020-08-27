@@ -15,7 +15,6 @@ import { app, BrowserWindow, ipcMain, Notification } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import * as fs from 'fs';
-import { getDoNotDisturb } from 'electron-notification-state';
 import MenuBuilder from './menu';
 import { DownloadContentMessage } from './utils/client';
 import download from './utils/downloader';
@@ -96,9 +95,14 @@ const createWindow = async () => {
     'download-content',
     async (event: Electron.Event, props: DownloadContentMessage) => {
       setupDownloadFolder(props.downloadPath);
-      await download(props.downloadPath, props.clientId, props.clientSecret, props.region)
+      await download(
+        props.downloadPath,
+        props.clientId,
+        props.clientSecret,
+        props.region
+      )
         .then(() => {
-          if (!getDoNotDisturb()) {
+          if (Notification.isSupported()) {
             const myNotification = new Notification({
               title: 'Interaction Content Downloader',
               body: 'Download completed.',
@@ -111,7 +115,9 @@ const createWindow = async () => {
             title: 'Interaction Content Downloader',
             body: 'There was a problem getting content.',
           });
-          myNotification.show();
+          if (Notification.isSupported()) {
+            myNotification.show();
+          }
         });
     }
   );
